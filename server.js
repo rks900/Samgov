@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const SAM_KEY = process.env.SAM_API_KEY;            // set in Render, never in code
+const SAM_KEY = process.env.SAM_API_KEY;
 const ALLOWED = (process.env.ALLOWED_ORIGINS || '[audos.com'/](https://audos.com')).split(',');
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -14,8 +14,8 @@ app.get('/sam', async (req, res) => {
     const params = new URLSearchParams({
       api_key: SAM_KEY,
       limit: req.query.limit || '20',
-      postedFrom: req.query.postedFrom,   // MM/dd/yyyy (required)
-      postedTo: req.query.postedTo,       // MM/dd/yyyy (required)
+      postedFrom: req.query.postedFrom,
+      postedTo: req.query.postedTo,
       ...(req.query.q ? { title: req.query.q } : {}),
       ...(req.query.naics ? { ncode: req.query.naics } : {}),
     });
