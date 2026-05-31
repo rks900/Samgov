@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const SAM_KEY = process.env.SAM_API_KEY;
-const ALLOWED = (process.env.ALLOWED_ORIGINS || ('['/](https://') + 'audos' + '.com')).split(',');
+const SAM_BASE = process.env.SAM_BASE;
+const ALLOWED = (process.env.ALLOWED_ORIGINS || '').split(',');
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (ALLOWED.includes(origin)) res.setHeader('Access-Control-Allow-Origin', origin);
@@ -19,8 +20,7 @@ app.get('/sam', async (req, res) => {
       ...(req.query.q ? { title: req.query.q } : {}),
       ...(req.query.naics ? { ncode: req.query.naics } : {}),
     });
-    const base = '['/](https://') + 'api.sam' + '.gov' + '/opportunities/v2/search?';
-    const r = await fetch(base + params.toString());
+    const r = await fetch(SAM_BASE + '?' + params.toString());
     const data = await r.json();
     res.status(r.status).json({ _live: r.ok, source: 'sam', ...data });
   } catch (e) {
