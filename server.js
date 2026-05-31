@@ -3,8 +3,6 @@ const app = express();
 const SAM_KEY = process.env.SAM_API_KEY;
 const SAM_BASE = process.env.SAM_BASE;
 
-// Try the configured path first, then the legacy "/prod/" stage path.
-// Both are derived from SAM_BASE so no full URLs live in this file.
 function candidates() {
   const list = [SAM_BASE];
   if (SAM_BASE && SAM_BASE.indexOf('/prod/') === -1) {
@@ -13,8 +11,6 @@ function candidates() {
   return list;
 }
 
-// Open CORS — this proxy only relays PUBLIC government data, and the
-// SAM key stays server-side. Works for every origin (preview + domain).
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -55,3 +51,9 @@ app.get('/sam', async (req, res) => {
       }
     } catch (e) {
       attempts.push({ base, error: String(e).slice(0, 120) });
+    }
+  }
+  res.status(200).json({ _live: false, source: 'sam', attempts });
+});
+
+app.listen(process.env.PORT || 3000);
