@@ -11,15 +11,14 @@ app.use((req, res, next) => {
   next();
 });
 app.get('/sam', async (req, res) => {
-  const params = new URLSearchParams({
-    api_key: SAM_KEY,
-    limit: req.query.limit || '20',
-    postedFrom: req.query.postedFrom || '',
-    postedTo: req.query.postedTo || '',
-    ...(req.query.q ? { title: req.query.q } : {}),
-    ...(req.query.naics ? { ncode: req.query.naics } : {}),
-  });
-  const target = SAM_BASE + '?' + params.toString();
+  const enc = encodeURIComponent;
+  let q = 'api_key=' + enc(SAM_KEY || '') +
+          '&limit=' + enc(req.query.limit || '20') +
+          '&postedFrom=' + (req.query.postedFrom || '') +
+          '&postedTo=' + (req.query.postedTo || '');
+  if (req.query.q) q += '&title=' + enc(req.query.q);
+  if (req.query.naics) q += '&ncode=' + enc(req.query.naics);
+  const target = SAM_BASE + '?' + q;
   const redacted = target.split(SAM_KEY || 'NOKEY').join('REDACTED');
   if (req.query.debug === '1') {
     return res.json({ samBaseRaw: SAM_BASE, keyLen: (SAM_KEY || '').length, redactedUrl: redacted });
