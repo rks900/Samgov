@@ -21,8 +21,9 @@ app.get('/sam', async (req, res) => {
       ...(req.query.naics ? { ncode: req.query.naics } : {}),
     });
     const r = await fetch(SAM_BASE + '?' + params.toString());
-    const data = await r.json();
-    res.status(r.status).json({ _live: r.ok, source: 'sam', ...data });
+    const t = await r.text();
+    let data; try { data = JSON.parse(t); } catch { data = { raw: t.slice(0, 300) }; }
+    res.status(200).json({ _live: r.ok, upstreamStatus: r.status, source: 'sam', ...data });
   } catch (e) {
     res.status(502).json({ _live: false, error: String(e) });
   }
