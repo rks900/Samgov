@@ -11,6 +11,14 @@ app.use((req, res, next) => {
   next();
 });
 app.get('/sam', async (req, res) => {
+  if (req.query.debug === '1') {
+    return res.json({
+      samBaseRaw: SAM_BASE,
+      samBaseLen: (SAM_BASE || '').length,
+      keyPresent: !!SAM_KEY,
+      keyLen: (SAM_KEY || '').length,
+    });
+  }
   try {
     const params = new URLSearchParams({
       api_key: SAM_KEY,
